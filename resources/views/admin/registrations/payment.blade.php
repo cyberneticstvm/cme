@@ -3,7 +3,7 @@
 @section('content')
 <a class="admin-back-link" href="{{ route('admin.dashboard') }}"><x-icon name="arrow-left" />Back to registrations</a>
 <div class="admin-page-heading admin-detail-heading"><div><p class="admin-eyebrow">PAYMENT &amp; DELEGATE PASS</p><h1>{{ $registration->full_name }}</h1><p class="admin-reference">Registration ID {{ $registration->reference }}</p></div><span class="admin-payment-badge payment-{{ $registration->payment_status->value }}"><span class="payment-dot payment-{{ $registration->payment_status->value }}"></span>{{ $registration->payment_status->label() }} payment</span></div>
-<nav class="admin-record-tabs" aria-label="Registration management"><a href="{{ route('admin.registrations.show', $registration) }}">Delegate details</a><a href="{{ route('admin.registrations.payment', $registration) }}" aria-current="page">Payment &amp; pass</a></nav>
+<x-admin-registration-tabs :registration="$registration" />
 @if($errors->any())<div class="admin-form-errors" role="alert" tabindex="-1" data-error-summary><strong>Please check these details.</strong><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 @if($registration->checked_in_at)<div class="admin-attendance-banner"><x-icon name="check" /><div><strong>Attendance recorded &middot; {{ $registration->checked_in_at->timezone('Asia/Kolkata')->format('d M Y, h:i A') }} IST</strong><p>This registration has already checked in. Replacing or resending its pass will not permit another entry.</p></div></div>@endif
 <div class="admin-payment-layout">

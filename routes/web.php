@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CheckInController;
+use App\Http\Controllers\Admin\RegistrationCertificateController;
 use App\Http\Controllers\Admin\RegistrationPaymentController;
 use App\Http\Controllers\Admin\SessionController;
 use App\Http\Controllers\RegistrationController;
@@ -26,6 +27,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin.headers')->group(funct
         Route::post('/check-in', [CheckInController::class, 'store'])->middleware('throttle:admin-check-in')->name('check-in.store');
         Route::get('/', [App\Http\Controllers\Admin\RegistrationController::class, 'index'])->name('dashboard');
         Route::get('/registrations/export', [App\Http\Controllers\Admin\RegistrationController::class, 'export'])->middleware('throttle:admin-export')->name('registrations.export');
+        Route::get('/registrations/{registration}/certificate', [RegistrationCertificateController::class, 'show'])->name('registrations.certificate');
+        Route::post('/registrations/{registration}/certificate', [RegistrationCertificateController::class, 'store'])->middleware('throttle:admin-emails')->name('registrations.certificate.send');
+        Route::get('/registrations/{registration}/certificate/download', [RegistrationCertificateController::class, 'download'])->name('registrations.certificate.download');
         Route::get('/registrations/{registration}/payment', [RegistrationPaymentController::class, 'show'])->name('registrations.payment');
         Route::put('/registrations/{registration}/payment', [RegistrationPaymentController::class, 'update'])->name('registrations.payment.update');
         Route::post('/registrations/{registration}/pass', [RegistrationPaymentController::class, 'sendPass'])->middleware('throttle:admin-emails')->name('registrations.pass.send');

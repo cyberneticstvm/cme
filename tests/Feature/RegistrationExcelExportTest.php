@@ -36,7 +36,7 @@ class RegistrationExcelExportTest extends TestCase
             $xpath = new DOMXPath($document);
             $xpath->registerNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
             $this->assertSame(17, $xpath->query('//s:row[number(@r) >= 5]')->length);
-            $this->assertSame('A4:Y21', $xpath->evaluate('string(//s:autoFilter/@ref)'));
+            $this->assertSame('A4:AC21', $xpath->evaluate('string(//s:autoFilter/@ref)'));
             $this->assertSame('A5', $xpath->evaluate('string(//s:pane/@topLeftCell)'));
             $this->assertStringNotContainsString('Excluded Optician', $xml);
             $zip->close();
@@ -67,7 +67,7 @@ class RegistrationExcelExportTest extends TestCase
             $this->assertSame('A & B <Clinic>', $xpath->evaluate('string(//s:c[@r="F5"]/s:is/s:t)'));
             $this->assertSame('@unsafe-formula', $xpath->evaluate('string(//s:c[@r="O5"]/s:is/s:t)'));
             $this->assertSame(0, $xpath->query('//s:f')->length);
-            $this->assertSame(25, $xpath->query('//s:row[@r="5"]/s:c[@t="inlineStr"]')->length);
+            $this->assertSame(29, $xpath->query('//s:row[@r="5"]/s:c[@t="inlineStr"]')->length);
             $zip->close();
         } finally {
             unset($zip);
@@ -88,7 +88,7 @@ class RegistrationExcelExportTest extends TestCase
             $zip->open($path);
             $xml = $zip->getFromName('xl/worksheets/sheet1.xml');
             $this->assertStringContainsString('Full name', $xml);
-            $this->assertStringContainsString('A4:Y4', $xml);
+            $this->assertStringContainsString('A4:AC4', $xml);
             $zip->close();
         } finally {
             unset($zip);
@@ -116,6 +116,38 @@ class RegistrationExcelExportTest extends TestCase
             $this->assertSame('1250.50', $xpath->evaluate('string(//s:c[@r="Q5"]/s:is/s:t)'));
             $this->assertSame('PAYMENT-TEST', $xpath->evaluate('string(//s:c[@r="R5"]/s:is/s:t)'));
             $this->assertSame('delegate@example.test', $xpath->evaluate('string(//s:c[@r="V5"]/s:is/s:t)'));
+            $zip->close();
+        } finally {
+            unset($zip);
+            unlink($path);
+        }
+    }
+
+    public function test_certificate_metadata_is_exported_in_valid_columns_beyond_z(): void
+    {
+        Registration::factory()->create([
+            'checked_in_at' => '2026-12-06 03:30:00', 'certificate_number' => 'VX26-PC-12345',
+            'certificate_issued_at' => '2026-12-06 12:00:00', 'certificate_sent_at' => '2026-12-06 12:01:00',
+            'certificate_sent_to' => 'delegate@example.test',
+        ]);
+        $this->signIn();
+
+        $response = $this->get(route('admin.registrations.export'));
+
+        $response->assertOk()->assertDownload();
+        $path = $response->baseResponse->getFile()->getPathname();
+        try {
+            $zip = new ZipArchive;
+            $this->assertTrue($zip->open($path) === true);
+            $document = new DOMDocument;
+            $this->assertTrue($document->loadXML($zip->getFromName('xl/worksheets/sheet1.xml')));
+            $xpath = new DOMXPath($document);
+            $xpath->registerNamespace('s', 'http://schemas.openxmlformats.org/spreadsheetml/2006/main');
+            $this->assertSame('VX26-PC-12345', $xpath->evaluate('string(//s:c[@r="Z5"]/s:is/s:t)'));
+            $this->assertSame('2026-12-06 17:30:00', $xpath->evaluate('string(//s:c[@r="AA5"]/s:is/s:t)'));
+            $this->assertSame('2026-12-06 17:31:00', $xpath->evaluate('string(//s:c[@r="AB5"]/s:is/s:t)'));
+            $this->assertSame('delegate@example.test', $xpath->evaluate('string(//s:c[@r="AC5"]/s:is/s:t)'));
+            $this->assertSame('A4:AC5', $xpath->evaluate('string(//s:autoFilter/@ref)'));
             $zip->close();
         } finally {
             unset($zip);

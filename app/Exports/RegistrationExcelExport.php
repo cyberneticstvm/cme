@@ -36,7 +36,7 @@ class RegistrationExcelExport
             $xml->endElement();
             $xml->endElement();
             $xml->startElement('cols');
-            foreach ([34, 27, 19, 34, 22, 32, 22, 22, 17, 25, 25, 25, 25, 55, 55, 19, 18, 30, 25, 24, 25, 34, 19, 25, 25] as $index => $width) {
+            foreach ([34, 27, 19, 34, 22, 32, 22, 22, 17, 25, 25, 25, 25, 55, 55, 19, 18, 30, 25, 24, 25, 34, 19, 25, 25, 30, 25, 25, 34] as $index => $width) {
                 $xml->startElement('col');
                 foreach (['min' => (string) ($index + 1), 'max' => (string) ($index + 1), 'width' => (string) $width, 'customWidth' => '1'] as $key => $value) {
                     $xml->writeAttribute($key, $value);
@@ -48,7 +48,9 @@ class RegistrationExcelExport
             $this->row($xml, 1, ['VISION X 2026 | Delegate registrations'], 1);
             $summary = $filters === [] ? 'All registrations' : collect($filters)->map(fn ($value, $key) => ucfirst($key).': '.$value)->implode(' | ');
             $this->row($xml, 2, ['Exported '.now()->timezone('Asia/Kolkata')->format('d M Y, h:i A').' IST | '.$summary], 3);
-            $this->row($xml, 4, ['Registration ID', 'Full name', 'Profession', 'Email address', 'Mobile number', 'Organisation', 'City / town', 'State / region', 'Status', 'Registered at (IST)', 'Consent recorded (IST)', 'Acknowledgement sent (IST)', 'Organiser notified (IST)', 'Delegate message', 'Internal notes', 'Payment status', 'Amount (INR)', 'Payment reference', 'Payment confirmed (IST)', 'Confirmed by', 'Pass emailed (IST)', 'Pass emailed to', 'Attendance', 'Checked in at (IST)', 'Checked in by'], 2);
+            $headers = ['Registration ID', 'Full name', 'Profession', 'Email address', 'Mobile number', 'Organisation', 'City / town', 'State / region', 'Status', 'Registered at (IST)', 'Consent recorded (IST)', 'Acknowledgement sent (IST)', 'Organiser notified (IST)', 'Delegate message', 'Internal notes', 'Payment status', 'Amount (INR)', 'Payment reference', 'Payment confirmed (IST)', 'Confirmed by', 'Pass emailed (IST)', 'Pass emailed to', 'Attendance', 'Checked in at (IST)', 'Checked in by', 'Certificate number', 'Certificate issued (IST)', 'Certificate emailed (IST)', 'Certificate emailed to'];
+            $lastColumn = $this->columnName(count($headers));
+            $this->row($xml, 4, $headers, 2);
             $number = 5;
             foreach ($query->reorder()->lazyByIdDesc(500) as $registration) {
                 $date = fn ($value) => $value?->timezone('Asia/Kolkata')->format('Y-m-d H:i:s') ?? '';
@@ -63,14 +65,15 @@ class RegistrationExcelExport
                     $registration->payment_reference ?? '', $date($registration->payment_confirmed_at),
                     $registration->payment_confirmed_by ?? '', $date($registration->pass_sent_at), $registration->pass_sent_to ?? '',
                     $registration->checked_in_at ? 'Checked in' : 'Not checked in', $date($registration->checked_in_at), $registration->checked_in_by ?? '',
+                    $registration->certificate_number ?? '', $date($registration->certificate_issued_at), $date($registration->certificate_sent_at), $registration->certificate_sent_to ?? '',
                 ]);
             }
             $xml->endElement();
             $xml->startElement('autoFilter');
-            $xml->writeAttribute('ref', 'A4:Y'.max(4, $number - 1));
+            $xml->writeAttribute('ref', 'A4:'.$lastColumn.max(4, $number - 1));
             $xml->endElement();
             $xml->startElement('mergeCells');
-            foreach (['A1:Y1', 'A2:Y2'] as $reference) {
+            foreach (['A1:'.$lastColumn.'1', 'A2:'.$lastColumn.'2'] as $reference) {
                 $xml->startElement('mergeCell');
                 $xml->writeAttribute('ref', $reference);
                 $xml->endElement();
@@ -104,6 +107,18 @@ class RegistrationExcelExport
         }
     }
 
+    private function columnName(int $number): string
+    {
+        $name = '';
+        do {
+            $number--;
+            $name = chr(65 + $number % 26).$name;
+            $number = intdiv($number, 26);
+        } while ($number > 0);
+
+        return $name;
+    }
+
     /** @param array<int, string> $values */
     private function row(XMLWriter $xml, int $number, array $values, int $style = 0): void
     {
@@ -115,7 +130,7 @@ class RegistrationExcelExport
         }
         foreach ($values as $index => $value) {
             $xml->startElement('c');
-            $xml->writeAttribute('r', chr(65 + $index).$number);
+            $xml->writeAttribute('r', $this->columnName($index + 1).$number);
             $xml->writeAttribute('t', 'inlineStr');
             $xml->writeAttribute('s', (string) $style);
             $xml->startElement('is');

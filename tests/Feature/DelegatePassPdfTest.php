@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Tests\TestCase;
 
 class DelegatePassPdfTest extends TestCase
@@ -63,8 +65,14 @@ class DelegatePassPdfTest extends TestCase
         Storage::disk('passes')->put($registration->passPath(), $bytes);
         config(['mail.mailers.preview' => ['transport' => 'array']]);
         $sent = Mail::mailer('preview')->to($registration->email)->send(new DelegatePass($registration));
+        if ($sent === null) {
+            $this->fail('The preview mailer must return a sent message.');
+        }
         $email = $sent->getSymfonySentMessage()->getOriginalMessage();
-        $attachments = array_values(array_filter($email->getAttachments(), fn ($attachment) => $attachment->getDisposition() === 'attachment'));
+        if (! $email instanceof Email) {
+            $this->fail('The mailer must assemble a structured Symfony Email message.');
+        }
+        $attachments = array_values(array_filter($email->getAttachments(), fn (DataPart $attachment): bool => $attachment->getDisposition() === 'attachment'));
         $this->assertCount(1, $attachments);
         $this->assertSame('application', $attachments[0]->getMediaType());
         $this->assertSame('pdf', $attachments[0]->getMediaSubtype());

@@ -68,6 +68,16 @@ class Registration extends Model
             && $this->status !== RegistrationStatus::Cancelled;
     }
 
+    public function canIssueCertificate(): bool
+    {
+        return $this->checked_in_at !== null && $this->status !== RegistrationStatus::Cancelled;
+    }
+
+    public function certificatePath(): ?string
+    {
+        return $this->certificate_id ? $this->certificate_id.'.pdf' : null;
+    }
+
     public function passPath(): ?string
     {
         return $this->pass_id ? $this->pass_id.'.pdf' : null;
@@ -86,6 +96,8 @@ class Registration extends Model
             'pass_issued_at' => 'immutable_datetime',
             'pass_qr_version' => 'integer',
             'checked_in_at' => 'immutable_datetime',
+            'certificate_issued_at' => 'immutable_datetime',
+            'certificate_sent_at' => 'immutable_datetime',
             'pass_sent_at' => 'immutable_datetime',
             'consented_at' => 'immutable_datetime',
             'acknowledgement_sent_at' => 'immutable_datetime',

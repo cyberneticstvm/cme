@@ -38,6 +38,14 @@ return [
             'report' => false,
         ],
 
+        'certificates' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/participation-certificates'),
+            'visibility' => 'private',
+            'serve' => false,
+            'throw' => true,
+        ],
+
         'passes' => [
             'driver' => 'local',
             'root' => storage_path('app/private/delegate-passes'),

@@ -3,7 +3,7 @@
 @section('content')
 <a class="admin-back-link" href="{{ route('admin.dashboard') }}"><x-icon name="arrow-left" />Back to registrations</a>
 <div class="admin-page-heading admin-detail-heading"><div><p class="admin-eyebrow">DELEGATE REGISTRATION</p><h1>{{ $registration->full_name }}</h1><p class="admin-reference">{{ $registration->reference }}</p></div><span class="admin-status admin-status-{{ $registration->status->value }}"><i></i>{{ $registration->status->label() }}</span></div>
-<nav class="admin-record-tabs" aria-label="Registration management"><a href="{{ route('admin.registrations.show', $registration) }}" aria-current="page">Delegate details</a><a href="{{ route('admin.registrations.payment', $registration) }}">Payment &amp; pass <span class="payment-dot payment-{{ $registration->payment_status->value }}"></span></a></nav>
+<x-admin-registration-tabs :registration="$registration" />
 @if($errors->any())<div class="admin-form-errors" role="alert" tabindex="-1" data-error-summary><strong>Please check the highlighted details.</strong><ul>@foreach($errors->getMessages() as $field => $messages)<li><a href="#{{ $field }}">{{ $messages[0] }}</a></li>@endforeach</ul></div>@endif
 <div class="admin-detail-layout"><section class="admin-edit-card" aria-labelledby="details-heading"><div class="admin-card-heading"><span><x-icon name="users" /></span><div><h2 id="details-heading">Delegate details</h2><p>Keep contact and professional information up to date.</p></div></div><form action="{{ route('admin.registrations.update', $registration) }}" method="POST" data-admin-submit>@csrf @method('PUT')
 <div class="admin-edit-grid">

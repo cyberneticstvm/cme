@@ -7,6 +7,7 @@ use App\Mail\RegistrationNotification;
 use App\Models\Registration;
 use Illuminate\Support\Facades\Mail;
 use PHPUnit\Framework\Attributes\TestWith;
+use Symfony\Component\Mime\Email;
 use Tests\TestCase;
 
 class RegistrationMailTest extends TestCase
@@ -20,7 +21,13 @@ class RegistrationMailTest extends TestCase
 
         $sent = Mail::mailer('preview')->to('delegate@example.test')->send(new $mailableClass($registration));
 
+        if ($sent === null) {
+            $this->fail('The preview mailer must return a sent message.');
+        }
         $email = $sent->getSymfonySentMessage()->getOriginalMessage();
+        if (! $email instanceof Email) {
+            $this->fail('The mailer must assemble a structured Symfony Email message.');
+        }
         $this->assertStringContainsString('cid:', $email->getHtmlBody());
         $this->assertStringContainsString('12345', $email->getTextBody());
         $this->assertCount(2, $email->getAttachments());

@@ -11,6 +11,7 @@ use App\Models\Registration;
 use App\PaymentStatus;
 use App\Profession;
 use App\RegistrationStatus;
+use App\Services\RegistrationCertificateService;
 use App\Services\RegistrationMailer;
 use App\Services\RegistrationPassService;
 use App\Services\RegistrationWorkflowLock;
@@ -44,14 +45,16 @@ class RegistrationController extends Controller
         return view('admin.registrations.show', ['registration' => $registration, 'professions' => Profession::cases(), 'statuses' => RegistrationStatus::cases()]);
     }
 
-    public function update(UpdateRegistrationRequest $request, Registration $registration, RegistrationWorkflowLock $lock, RegistrationPassService $passes): RedirectResponse
+    public function update(UpdateRegistrationRequest $request, Registration $registration, RegistrationWorkflowLock $lock, RegistrationPassService $passes, RegistrationCertificateService $certificates): RedirectResponse
     {
-        $lock->run($registration, function (Registration $current) use ($request, $passes): void {
+        $lock->run($registration, function (Registration $current) use ($request, $passes, $certificates): void {
             $emailChanged = $current->email !== $request->validated('email');
             $current->fill($request->safe()->only(['full_name', 'profession', 'email', 'phone', 'organisation', 'city', 'state', 'message']));
             $current->status = $request->enum('status', RegistrationStatus::class);
             $current->admin_notes = $request->validated('admin_notes');
             $passChanged = $current->isDirty(['full_name', 'profession', 'email', 'organisation', 'city', 'state'])
+                || $current->status === RegistrationStatus::Cancelled;
+            $certificateChanged = $current->isDirty(['full_name', 'email', 'profession', 'organisation'])
                 || $current->status === RegistrationStatus::Cancelled;
             if ($emailChanged) {
                 $current->acknowledgement_sent_at = null;
@@ -68,16 +71,21 @@ class RegistrationController extends Controller
                 $passes->revoke($current);
                 $current->save();
             }
+            if ($certificateChanged && $current->certificate_id) {
+                $certificates->revoke($current);
+                $current->save();
+            }
         });
 
-        return to_route('admin.registrations.show', $registration)->with('status', 'Registration updated successfully. Existing passes are revoked when delegate details change or a registration is cancelled.');
+        return to_route('admin.registrations.show', $registration)->with('status', 'Registration updated successfully. Existing passes and certificates are revoked when their delegate details change or a registration is cancelled.');
     }
 
-    public function destroy(DestroyRegistrationRequest $request, Registration $registration, RegistrationWorkflowLock $lock, RegistrationPassService $passes): RedirectResponse
+    public function destroy(DestroyRegistrationRequest $request, Registration $registration, RegistrationWorkflowLock $lock, RegistrationPassService $passes, RegistrationCertificateService $certificates): RedirectResponse
     {
         $name = $registration->full_name;
-        $lock->run($registration, function (Registration $current) use ($passes): void {
+        $lock->run($registration, function (Registration $current) use ($passes, $certificates): void {
             $passes->revoke($current);
+            $certificates->revoke($current);
             $current->delete();
         });
         $filters = array_filter($request->safe()->except(['confirm_delete']), fn ($value) => $value !== null && $value !== '');
