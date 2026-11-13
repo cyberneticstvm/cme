@@ -1,0 +1,18 @@
+@extends('layouts.admin')
+@section('title', 'Admin Sign In')
+@section('guest', 'true')
+@section('content')
+<main id="admin-main" class="admin-login-layout">
+    <section class="admin-login-story" aria-label="VISION X 2026 organiser workspace"><img class="admin-login-photo" src="{{ asset('images/eye-hero.jpg') }}" alt="" width="1800" height="1200"><div class="admin-login-shade"></div><a href="{{ route('home') }}" class="admin-login-brand"><img src="{{ asset('images/visionx-2026-logo.png') }}" alt="VISION X 2026" width="1922" height="818"></a><div class="admin-login-story-copy"><p class="admin-eyebrow">THE PEOPLE BEHIND THE PERSPECTIVE</p><h1>A shared vision.<br><span>Seamlessly managed.</span></h1><p>Your workspace for the connections that make<br class="admin-desktop-break"> VISION X 2026 possible.</p><div class="admin-login-event"><span><x-icon name="calendar" />06 December 2026</span><span><x-icon name="pin" />Shastamcotta, Kerala</span></div></div><div class="admin-login-story-foot">DEVI EYE HOSPITAL<span>IN ASSOCIATION WITH IOA KERALA</span></div></section>
+    <section class="admin-login-panel" aria-labelledby="login-heading"><div class="admin-login-card"><a class="admin-back-link" href="{{ route('home') }}"><x-icon name="arrow-left" />Back to the event website</a><span class="admin-login-lock"><x-icon name="lock" /></span><p class="admin-eyebrow">ORGANISER ACCESS</p><h2 id="login-heading">Welcome back.</h2><p class="admin-login-description">Sign in to manage your delegate community.</p>
+        @if(session('status'))<div class="admin-flash" role="status">{{ session('status') }}</div>@endif
+        @if($throttled ?? false)<div class="admin-form-errors" role="alert">Too many sign-in attempts. Please wait one minute and try again.</div>@endif
+        @if($errors->any())<div class="admin-form-errors" role="alert" tabindex="-1" data-error-summary>{{ $errors->first() }}</div>@endif
+        @unless($configured)<div class="admin-config-note"><x-icon name="lock" /><p>Administrator access is awaiting configuration.</p></div>@endunless
+        <form action="{{ route('admin.login.store') }}" method="POST" class="admin-login-form" data-admin-submit>@csrf
+            <div class="admin-field"><label for="username">Username</label><input type="text" name="username" id="username" value="{{ is_string(old('username')) ? old('username') : '' }}" maxlength="100" required autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Your admin username" @if($errors->has('username')) aria-invalid="true" @endif></div>
+            <div class="admin-field"><label for="password">Password</label><div class="admin-password-wrap"><input type="password" name="password" id="password" maxlength="512" required autocomplete="current-password" placeholder="Enter your password"><button type="button" data-password-toggle aria-controls="password" aria-label="Show password" aria-pressed="false"><x-icon name="eye" /></button></div></div>
+            <button type="submit" class="admin-button admin-button-primary admin-login-submit"><span>Sign in to workspace</span><x-icon name="arrow-right" /></button>
+        </form><div class="admin-login-session"><x-icon name="lock" /><span>Your session is private and expires after {{ max(1, (int) config('admin.session_timeout')) }} minutes of inactivity.</span></div><div class="admin-login-hospital"><img src="{{ asset('images/devi-eye-hospital-transparent.png') }}" alt="Devi Eye Hospital" width="1440" height="720"><p>VISION X 2026<br><strong>Continuing Medical Education</strong></p></div></div><p class="admin-login-copyright">&copy; {{ now()->year }} VISION X. All rights reserved.</p></section>
+</main>
+@endsection
