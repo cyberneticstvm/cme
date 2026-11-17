@@ -45,7 +45,7 @@ class RegistrationMailTest extends TestCase
         $mail->assertSeeInHtml('12345');
         $mail->assertSeeInHtml('YOUR REGISTRATION ID');
         $mail->assertSeeInHtml('6 DECEMBER 2026');
-        $mail->assertSeeInHtml('Shastamcotta, Kerala');
+        $mail->assertSeeInHtml('Sasthamcotta, Kerala');
         $mail->assertSeeInHtml('Optometrist');
         $mail->assertSeeInText($registration->email);
         $mail->assertSeeInText('12345');

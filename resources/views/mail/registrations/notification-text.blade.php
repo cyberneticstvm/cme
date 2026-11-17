@@ -23,7 +23,7 @@ Event communication consent recorded: {!! $registration->consented_at->timezone(
 
 Reply directly to this email to contact the delegate.
 
-Sunday, 6 December 2026 | Shastamcotta, Kerala
+Sunday, 6 December 2026 | Sasthamcotta, Kerala
 Devi Eye Hospital, in association with Indian Optometrists Association, Kerala.
 
 Internal notification for the VISION X 2026 organising team. Please handle delegate contact details with care.

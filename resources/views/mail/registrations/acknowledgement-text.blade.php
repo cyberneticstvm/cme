@@ -14,7 +14,7 @@ Organisation: {!! $registration->organisation ?: 'Not provided' !!}
 Location: {!! $registration->city !!}, {!! $registration->state !!}
 
 Sunday, 6 December 2026
-Shastamcotta, Kerala. Exact venue to be announced.
+Sasthamcotta, Kerala. Exact venue to be announced.
 
 Keep your registration ID handy. Our organising team will share further event and fee information. This email acknowledges receipt of your details.
 

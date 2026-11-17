@@ -54,3 +54,58 @@
 @media (max-width: 767px) { .enrolment-recovery-panel { padding: 28px 22px; } .enrolment-recovery-back { margin-bottom: 24px; } }
 
 @media (min-width: 960px) and (max-height: 750px) { .delegate-compact:not(.delegate-recovery) main { padding-top: 10px; padding-bottom: 10px; } .delegate-compact:not(.delegate-recovery) .enrolment-form-panel { padding-top: 22px; padding-bottom: 15px; } }
+
+/* Comfortable type and controls at every viewport size. */
+.enrolment-form-panel { padding: 34px; }
+.enrolment-form-heading { flex-wrap: wrap; margin-bottom: 24px; }
+.enrolment-form-heading h2 { font-size: 28px; line-height: 1.25; }
+.enrolment-form-heading p { font-size: 15px; line-height: 1.65; color: #48657c; }
+.enrolment-open { font-size: 11px; letter-spacing: .5px; color: #286851; }
+.delegate-compact .delegate-professions { margin-bottom: 24px; }
+.delegate-compact .delegate-profession-grid { gap: 12px; }
+.delegate-compact .delegate-profession-content { min-height: 58px; padding: 14px 12px; border-radius: 10px; border-color: #a9bece; }
+.delegate-compact .delegate-profession-content strong { font-size: 14px; color: #244760; }
+.delegate-compact .delegate-radio-dot { top: 21px; }
+.delegate-compact .delegate-fields { gap: 22px 20px; }
+.delegate-compact .delegate-field > label { font-size: 15px; line-height: 1.5; margin-bottom: 8px; color: #244760; }
+.delegate-compact .delegate-field label small { font-size: 12px; color: #526d81; }
+.delegate-compact .delegate-field input,
+.delegate-compact .delegate-field textarea { min-height: 50px; padding: 12px 14px; font-size: 16px; line-height: 1.5; color: #173c59; background: #fff; border: 1px solid #a9bece; border-radius: 10px; box-shadow: 0 1px 2px #123c5908; transition: border-color .15s, box-shadow .15s; }
+.delegate-compact .delegate-field input::placeholder,
+.delegate-compact .delegate-field textarea::placeholder { font-size: 15px; color: #61788b; opacity: 1; }
+.delegate-compact .delegate-field input:focus,
+.delegate-compact .delegate-field textarea:focus { outline: 2px solid #0875bd; outline-offset: 2px; border-color: #0875bd; box-shadow: 0 0 0 4px #0875bd12; }
+.delegate-compact .delegate-field [aria-invalid="true"] { border-color: #aa342e; }
+.delegate-compact .delegate-profession input:focus-visible + .delegate-profession-content { outline: 2px solid #0875bd; outline-offset: 3px; }
+.enrolment-optional { margin-top: 22px; }
+.enrolment-optional > summary { min-height: 44px; gap: 9px; }
+.enrolment-optional > summary > span,
+.enrolment-optional[open] > summary > span { font-size: 14px; color: #365b76; }
+.enrolment-optional > summary > small { font-size: 12px; color: #526d81; }
+.delegate-compact .enrolment-optional textarea { min-height: 110px; }
+.delegate-compact .delegate-consent { margin-top: 20px; padding-top: 20px; }
+.delegate-compact .delegate-consent label { font-size: 14px; line-height: 1.7; gap: 12px; color: #36566e; }
+.delegate-compact .delegate-consent input { width: 20px; height: 20px; flex-shrink: 0; margin-top: 3px; accent-color: #0875bd; }
+.delegate-compact .delegate-submit-row { margin-top: 24px; }
+.delegate-compact .delegate-submit.button { min-height: 52px; padding: 14px 24px; font-size: 16px; border-radius: 10px; }
+.enrolment-submit-info { font-size: 13px; line-height: 1.75; margin-top: 16px; color: #48657c; }
+.enrolment-submit-info small { display: block; color: #48657c; }
+.enrolment-email-check { font-size: 13px; }
+.enrolment-recover-link { font-size: 13px; line-height: 1.6; margin-top: 8px; }
+.delegate-compact .delegate-error { font-size: 13px !important; }
+.delegate-compact .delegate-error-summary,
+.delegate-compact .delegate-error-summary > strong { font-size: 15px; }
+@media (max-width: 900px) {
+    .enrolment-shell { grid-template-columns: minmax(0, 1fr); max-width: 700px; }
+    .enrolment-story { display: flex; gap: 18px; }
+}
+@media (max-width: 480px) {
+    .enrolment-form-panel { padding: 26px 20px; }
+    .enrolment-form-heading h2 { font-size: 25px; }
+    .delegate-compact .delegate-fields { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .delegate-compact .delegate-profession-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .delegate-compact .delegate-profession-content { justify-content: flex-start; min-height: 52px; }
+    .delegate-compact .delegate-profession-content > svg { display: block; }
+    .delegate-compact .delegate-radio-dot { display: block; top: 19px; right: 14px; }
+    .delegate-compact .delegate-submit-row > .delegate-submit { width: 100%; justify-content: center; }
+}

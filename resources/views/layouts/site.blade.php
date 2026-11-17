@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'VISION X 2026 | Eye Care CME')</title>
-    <meta name="description" content="@yield('description', 'Register for VISION X 2026, an eye care CME for doctors, optometrists and opticians, on 6 December 2026 in Shastamcotta, Kerala.')">
+    <meta name="description" content="@yield('description', 'Register for VISION X 2026, an eye care CME for doctors, optometrists and opticians, on 6 December 2026 in Sasthamcotta, Kerala.')">
     <meta name="theme-color" content="#092d62">
     <link rel="canonical" href="{{ url()->current() }}">
     <meta property="og:type" content="website">

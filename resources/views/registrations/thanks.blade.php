@@ -13,7 +13,7 @@
             Your registration is safely saved. Your email acknowledgement is pending; please keep the ID above and contact us on WhatsApp if you need assistance.
         @endif
     </p></div>
-    <div class="delegate-success-event"><span><x-icon name="calendar" />Sunday, 6 December 2026</span><span><x-icon name="pin" />Shastamcotta, Kerala</span></div>
+    <div class="delegate-success-event"><span><x-icon name="calendar" />Sunday, 6 December 2026</span><span><x-icon name="pin" />Sasthamcotta, Kerala</span></div>
     <p class="delegate-success-note">Our organising team will share further event and fee information. This acknowledgement confirms receipt of your details.</p>
     <div class="delegate-success-actions"><a class="button" href="{{ asset('visionx-2026.ics') }}" download>Save the date <x-icon name="calendar" /></a><a class="text-link" href="{{ route('home') }}">Back to the homepage <x-icon name="arrow-right" /></a></div>
 </div></div></section>

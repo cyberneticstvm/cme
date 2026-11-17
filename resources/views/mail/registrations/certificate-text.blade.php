@@ -8,7 +8,7 @@ Your personalised Certificate of Participation is attached as a PDF. Please save
 
 Certificate number: {!! $registration->certificate_number !!}
 Registration ID: {!! $registration->reference !!}
-Event: Sunday, 6 December 2026, Shastamcotta, Kerala
+Event: Sunday, 6 December 2026, Sasthamcotta, Kerala
 Participation confirmed from your event check-in.
 
 If any details need correction, please contact the organising team through the website.

@@ -5,7 +5,7 @@
     <div class="poster-layout">
         <div class="poster-artwork">
             <span class="poster-mobile-label">OFFICIAL EVENT ANNOUNCEMENT</span>
-            <img data-popup-poster data-src="{{ asset('images/visionx-2026-poster.jpeg') }}" alt="Official VISION X 2026 CME poster: Devi Eye Hospital in association with Indian Optometrists Association Kerala. Sunday, 6 December 2026, Shastamcotta." width="1230" height="1278" decoding="async">
+            <img data-popup-poster data-src="{{ asset('images/visionx-2026-poster.jpeg') }}" alt="Official VISION X 2026 CME poster: Devi Eye Hospital in association with Indian Optometrists Association Kerala. Sunday, 6 December 2026, Sasthamcotta." width="1230" height="1278" decoding="async">
         </div>
         <div class="poster-copy">
             <div class="poster-copy-main">
@@ -14,7 +14,7 @@
                 <p id="poster-dialog-description">Join doctors, optometrists and opticians for VISION X 2026, a continuing medical education programme.</p>
                 <div class="poster-event-details">
                     <div><x-icon name="calendar" /><span><small>SAVE THE DATE</small><strong>6 December 2026</strong><span>Sunday</span></span></div>
-                    <div><x-icon name="pin" /><span><small>THE DESTINATION</small><strong>Shastamcotta, Kerala</strong></span></div>
+                    <div><x-icon name="pin" /><span><small>THE DESTINATION</small><strong>Sasthamcotta, Kerala</strong></span></div>
                 </div>
             </div>
             <div class="poster-actions">

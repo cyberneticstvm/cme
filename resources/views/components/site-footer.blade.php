@@ -7,7 +7,7 @@
         </div>
         <div class="footer-event-strip">
             <div class="footer-date"><strong>06</strong><span>DECEMBER 2026<br><b>SUNDAY</b></span></div>
-            <div class="footer-location"><span aria-hidden="true"><x-icon name="pin" /></span><div><strong>Shastamcotta, Kerala</strong><span>A day to connect, learn and look ahead.</span></div></div>
+            <div class="footer-location"><span aria-hidden="true"><x-icon name="pin" /></span><div><strong>Sasthamcotta, Kerala</strong><span>A day to connect, learn and look ahead.</span></div></div>
             <a href="{{ asset('visionx-2026.ics') }}" download>Add to your calendar <span aria-hidden="true"><x-icon name="arrow-up-right" /></span></a>
         </div>
         <div class="footer-columns">
