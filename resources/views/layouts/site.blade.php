@@ -18,6 +18,7 @@
     <script src="{{ asset('js/site.js') }}?v={{ filemtime(public_path('js/site.js')) }}" defer></script>
     <script src="{{ asset('js/registration.js') }}?v={{ filemtime(public_path('js/registration.js')) }}" defer></script>
     @yield('head')
+    @stack('styles')
 </head>
 <body class="delegate-page @yield('body-class')">
     <a class="skip-link" href="#main">Skip to content</a>

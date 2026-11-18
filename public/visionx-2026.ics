@@ -5,10 +5,11 @@ CALSCALE:GREGORIAN
 BEGIN:VEVENT
 UID:visionx-20261206@devi-eye-cme
 DTSTAMP:20261113T000000Z
-DTSTART;VALUE=DATE:20261206
-DTEND;VALUE=DATE:20261207
+DTSTART:20261206T031500Z
+DTEND:20261206T110000Z
 SUMMARY:VISION X 2026 CME Programme
-LOCATION:Sasthamcotta\, Kerala\, India
-DESCRIPTION:Devi Eye Hospital in association with Indian Optometrists Association Kerala. Exact venue and timings to be announced.
+LOCATION:Gemini Heights Auditorium\, Sasthamcotta\, Kerala\, India
+DESCRIPTION:Devi Eye Hospital in association with Indian Optometrists
+  Association Kerala.
 END:VEVENT
 END:VCALENDAR

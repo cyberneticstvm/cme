@@ -1,0 +1,138 @@
+.registration-payment {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(132px, 200px);
+    align-items: start;
+    gap: clamp(18px, 4vw, 32px);
+    margin-block: 24px;
+    padding: clamp(16px, 3vw, 26px);
+    border: 1px solid #cfdfeb;
+    border-radius: 13px;
+    background: #f4f9fd;
+    text-align: left;
+}
+
+.registration-payment-public {
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) minmax(160px, 225px);
+    padding: clamp(20px, 4vw, 40px);
+}
+
+.registration-payment-public .registration-payment-copy p:not(.eyebrow) {
+    max-width: 620px;
+    font-size: 15px;
+}
+
+.registration-payment-jump {
+    color: #d2e7f8;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.enrolment-shell > .enrolment-payment {
+    grid-column: 1 / -1;
+    margin: 0;
+    border-inline: 0;
+    border-bottom: 0;
+    border-radius: 0;
+}
+
+.enrolment-payment-link {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 16px;
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    border: 1px solid #cfdfeb;
+    border-radius: 8px;
+    background: #f4f9fd;
+    color: var(--navy);
+    font-size: 13px;
+}
+
+.enrolment-payment-link span {
+    color: #155b8c;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.registration-payment-qr {
+    display: grid;
+    justify-items: center;
+    gap: 9px;
+}
+
+.registration-payment-qr img {
+    width: 100%;
+    height: auto;
+    background: #fff;
+    border-radius: 7px;
+}
+
+.registration-payment-qr a, .registration-payment-copy p a {
+    color: #155b8c;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.registration-payment-qr a {
+    font-size: 12px;
+}
+
+.registration-payment-copy .eyebrow {
+    margin-bottom: 5px;
+}
+
+.registration-payment-copy h2 {
+    color: var(--navy);
+    font-size: 31px;
+    letter-spacing: -.04em;
+}
+
+.registration-payment-copy p:not(.eyebrow) {
+    margin-top: 10px;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.registration-payment-copy p strong {
+    color: var(--navy);
+}
+
+.registration-payment-apps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    margin: 13px 0;
+}
+
+.registration-payment-apps .button {
+    padding: 10px 13px;
+    gap: 8px;
+    border-radius: 5px;
+    color: var(--deep);
+}
+
+.registration-payment-apps .button:hover {
+    background: #ffab6c;
+    border-color: #ffab6c;
+}
+
+.registration-payment-apps .text-link {
+    font-size: 12px;
+}
+
+@media (max-width: 620px) {
+    .registration-payment {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .registration-payment-qr {
+        max-width: 200px;
+        justify-self: center;
+    }
+}

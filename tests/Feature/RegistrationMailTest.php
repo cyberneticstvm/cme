@@ -5,16 +5,20 @@ namespace Tests\Feature;
 use App\Mail\RegistrationAcknowledgement;
 use App\Mail\RegistrationNotification;
 use App\Models\Registration;
+use App\PaymentStatus;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Tests\TestCase;
 
 class RegistrationMailTest extends TestCase
 {
-    #[TestWith([RegistrationAcknowledgement::class])]
-    #[TestWith([RegistrationNotification::class])]
-    public function test_emails_are_assembled_with_inline_logos_and_plain_text(string $mailableClass): void
+    #[TestWith([RegistrationAcknowledgement::class, ['visionx-2026-logo.png', 'visionx-payment-qr.png', 'devi-eye-hospital-transparent.png']])]
+    #[TestWith([RegistrationNotification::class, ['visionx-2026-logo.png', 'devi-eye-hospital-transparent.png']])]
+    /** @param list<string> $filenames */
+    public function test_emails_are_assembled_with_inline_images_and_plain_text(string $mailableClass, array $filenames): void
     {
         config(['mail.mailers.preview' => ['transport' => 'array']]);
         $registration = Registration::factory()->make(['reference' => '12345', 'created_at' => now()]);
@@ -30,8 +34,12 @@ class RegistrationMailTest extends TestCase
         }
         $this->assertStringContainsString('cid:', $email->getHtmlBody());
         $this->assertStringContainsString('12345', $email->getTextBody());
-        $this->assertCount(2, $email->getAttachments());
-        foreach ($email->getAttachments() as $attachment) {
+        $attachments = $email->getAttachments();
+        $attachedFilenames = array_map(fn (DataPart $attachment): ?string => $attachment->getFilename(), $attachments);
+        sort($filenames);
+        sort($attachedFilenames);
+        $this->assertSame($filenames, $attachedFilenames);
+        foreach ($attachments as $attachment) {
             $this->assertSame('inline', $attachment->getDisposition());
         }
     }
@@ -50,6 +58,32 @@ class RegistrationMailTest extends TestCase
         $mail->assertSeeInText($registration->email);
         $mail->assertSeeInText('12345');
         $mail->assertSeeInText('6 December 2026');
+    }
+
+    public function test_acknowledgement_provides_payment_and_gate_pass_instructions_in_both_formats(): void
+    {
+        config(['services.whatsapp.number' => '+91 (94970) 05735']);
+        $registration = Registration::factory()->make(['reference' => '12345']);
+        $mail = new RegistrationAcknowledgement($registration);
+        $paymentUrl = URL::signedRoute('registrations.payment', ['reference' => '12345']);
+
+        foreach (['Rs.500/-', 'payment screenshot and registration ID', '+919497005735', 'gate pass', $paymentUrl] as $text) {
+            $mail->assertSeeInHtml($text);
+            $mail->assertSeeInText($text);
+        }
+
+        $mail->assertSeeInHtml('Devi Eye Hospital payment QR code');
+        $mail->assertSeeInHtml('https://wa.me/919497005735?text=');
+    }
+
+    public function test_acknowledgement_omits_payment_instructions_when_payment_is_confirmed(): void
+    {
+        $registration = Registration::factory()->make(['reference' => '12345', 'payment_status' => PaymentStatus::Confirmed]);
+
+        $mail = new RegistrationAcknowledgement($registration);
+
+        $mail->assertDontSeeInHtml('Devi Eye Hospital payment QR code');
+        $mail->assertDontSeeInText('Rs.500/-');
     }
 
     public function test_organiser_email_contains_complete_details_and_reply_to_delegate(): void

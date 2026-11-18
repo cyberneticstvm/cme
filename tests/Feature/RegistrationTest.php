@@ -5,10 +5,13 @@ namespace Tests\Feature;
 use App\Mail\RegistrationAcknowledgement;
 use App\Mail\RegistrationNotification;
 use App\Models\Registration;
+use App\PaymentStatus;
+use App\RegistrationStatus;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Mail\PendingMail;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Mockery;
 use PHPUnit\Framework\Attributes\TestWith;
 use RuntimeException;
@@ -26,7 +29,7 @@ class RegistrationTest extends TestCase
 
     public function test_page_is_public_and_homepage_registration_links_open_the_form(): void
     {
-        $this->get(route('registrations.create'))->assertOk()->assertSee('Your delegate details')->assertSee('name="_token"', false);
+        $this->get(route('registrations.create'))->assertOk()->assertSee('Your delegate details')->assertSee('name="_token"', false)->assertSeeText('Rs.500/-');
         $this->get(route('home'))->assertOk()->assertSee('href="'.route('registrations.create').'"', false)->assertDontSee('Registration opening soon');
     }
 
@@ -54,7 +57,47 @@ class RegistrationTest extends TestCase
         Mail::assertSentCount(2);
         $this->get(route('registrations.thanks'))->assertOk()
             ->assertSeeText($registration->reference)->assertSeeText('arun@example.test')
+            ->assertSeeText('Rs.500/-')->assertSee('Devi Eye Hospital payment QR code')
             ->assertDontSeeText('Your email acknowledgement is pending')->assertDontSee('@else');
+    }
+
+    public function test_signed_payment_page_prefills_the_merchant_fee_and_registration_id(): void
+    {
+        config(['services.whatsapp.number' => '+919497005735']);
+        $registration = Registration::factory()->create(['full_name' => 'Private Delegate']);
+        $url = URL::signedRoute('registrations.payment', ['reference' => $registration->reference]);
+
+        $this->get($url)->assertOk()
+            ->assertHeader('Cache-Control', 'no-store, private')
+            ->assertSee('href="upi://pay?', false)
+            ->assertSee('href="gpay://upi/pay?', false)
+            ->assertSee('pa=vyapar.175693565052%40hdfcbank', false)
+            ->assertSee('tn='.$registration->reference.'&amp;am=500.00&amp;cu=INR', false)
+            ->assertSeeText('WhatsApp (+919497005735)')
+            ->assertSee('Devi Eye Hospital payment QR code')
+            ->assertDontSee($registration->full_name)
+            ->assertDontSee($registration->email);
+    }
+
+    public function test_an_unsigned_payment_link_cannot_open_the_payment_page(): void
+    {
+        $registration = Registration::factory()->create();
+
+        $this->get(route('registrations.payment', ['reference' => $registration->reference]))
+            ->assertForbidden();
+    }
+
+    #[TestWith([PaymentStatus::Confirmed, RegistrationStatus::Confirmed])]
+    #[TestWith([PaymentStatus::Refunded, RegistrationStatus::Confirmed])]
+    #[TestWith([PaymentStatus::Pending, RegistrationStatus::Cancelled])]
+    public function test_payment_page_hides_payment_options_after_resolution(PaymentStatus $paymentStatus, RegistrationStatus $registrationStatus): void
+    {
+        $registration = Registration::factory()->create(['payment_status' => $paymentStatus, 'status' => $registrationStatus]);
+
+        $this->get(URL::signedRoute('registrations.payment', ['reference' => $registration->reference]))
+            ->assertOk()
+            ->assertDontSee('Devi Eye Hospital payment QR code')
+            ->assertDontSee('data-upi-payment');
     }
 
     public function test_missing_required_details_do_not_save_or_send_emails(): void

@@ -9,6 +9,7 @@ use App\Http\Controllers\RegistrationRecoveryController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
+Route::view('/program-schedule', 'program-schedule')->name('program-schedule');
 Route::get('/register', [RegistrationController::class, 'create'])->name('registrations.create');
 Route::post('/register', [RegistrationController::class, 'store'])
     ->middleware('throttle:5,1')->name('registrations.store');
@@ -16,6 +17,8 @@ Route::post('/register/check-email', [RegistrationRecoveryController::class, 'ch
 Route::get('/registration-id', [RegistrationRecoveryController::class, 'create'])->name('registrations.recover');
 Route::post('/registration-id', [RegistrationRecoveryController::class, 'send'])->middleware('throttle:registration-recovery')->name('registrations.recover.send');
 Route::get('/register/thank-you', [RegistrationController::class, 'thanks'])->name('registrations.thanks');
+Route::get('/register/payment/{reference}', [RegistrationController::class, 'payment'])
+    ->middleware('signed')->name('registrations.payment');
 
 Route::prefix('admin')->name('admin.')->middleware('admin.headers')->group(function (): void {
     Route::get('/login', [SessionController::class, 'create'])->name('login');

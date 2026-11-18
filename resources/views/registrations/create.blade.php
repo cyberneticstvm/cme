@@ -1,4 +1,5 @@
 @extends('layouts.site')
+@use('App\Services\RegistrationPayment')
 @section('title', 'Delegate Registration | VISION X 2026 CME')
 @section('body-class', 'delegate-compact')
 @section('head')
@@ -8,7 +9,11 @@
 <section class="container enrolment-shell" aria-labelledby="form-heading">
     <x-enrolment-story />
     <div class="enrolment-form-panel">
-        <div class="enrolment-form-heading"><div><h2 id="form-heading">Your delegate details</h2><p>Choose your profession. Fields marked * are required.</p></div><span class="enrolment-open"><i></i>REGISTRATION OPEN</span></div>
+        <div class="enrolment-form-heading"><div><h2 id="form-heading">Your delegate details</h2><p>Choose your profession. Fields marked * are required.</p></div></div>
+        <a class="enrolment-payment-link" href="#registration-payment">
+            <strong>Registration fee Rs.{{ RegistrationPayment::FEE }}/-</strong>
+            <span>View payment details <x-icon name="arrow-right" /></span>
+        </a>
         @if($errors->any())
             <div class="delegate-error-summary" role="alert" tabindex="-1" id="form-errors"><strong>Please check your details</strong><ul>@foreach($errors->getMessages() as $field => $messages)<li><a href="#{{ $field === 'profession' ? 'profession-doctor' : ($field === 'registration' ? 'form-heading' : $field) }}">{{ $messages[0] }}</a></li>@endforeach</ul></div>
         @endif
@@ -38,9 +43,10 @@
             <div class="delegate-honeypot" aria-hidden="true"><label for="website">Leave this field empty</label><input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></div>
             <div class="delegate-consent"><label for="consent"><input type="checkbox" name="consent" id="consent" value="1" @checked(old('consent')) required @if($errors->has('consent')) aria-invalid="true" aria-describedby="consent-error" @endif><span>I agree to Devi Eye Hospital using my details for VISION X 2026 registration and event updates. <span aria-hidden="true">*</span></span></label>@error('consent')<p id="consent-error" class="delegate-error">{{ $message }}</p>@enderror</div>
             <div class="delegate-submit-row"><button class="button delegate-submit" type="submit"><span data-submit-label>Submit registration</span><x-icon name="arrow-up-right" /><span class="delegate-spinner" aria-hidden="true"></span></button></div>
-            <p class="enrolment-submit-info"><x-icon name="mail" /><span>Your registration ID and acknowledgement will be emailed to you. <small>One registration per email. Your pass follows payment confirmation.</small></span></p>
+            <p class="enrolment-submit-info"><x-icon name="mail" /><span>Your acknowledgement email will include your registration ID, payment QR code and UPI link. <small>One registration per email. Your gate pass follows payment verification.</small></span></p>
         </form>
     </div>
+    <x-registration-payment id="registration-payment" class="enrolment-payment" />
 </section>
 @endsection
 @section('footer')

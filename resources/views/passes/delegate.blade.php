@@ -231,8 +231,8 @@
                                             <p>Show this pass at the entry desk.</p>
                                         </td>
                                         <td>
-                                            <div class="eyebrow" style="margin-bottom:6px">THE DESTINATION</div><strong>Sasthamcotta, Kerala</strong>
-                                            <p>Exact venue and timings will follow.</p>
+                                            <div class="eyebrow" style="margin-bottom:6px">THE DESTINATION</div><strong>Gemini Heights Auditorium</strong>
+                                            <p>Sasthamcotta, Kerala</p>
                                         </td>
                                     </tr>
                                 </table>
