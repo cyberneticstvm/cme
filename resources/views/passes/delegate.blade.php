@@ -78,7 +78,7 @@
             font-size: 9px;
         }
 
-        .paid {
+        .pass-label {
             background: #e8f7ee;
             color: #246747;
             display: inline-block;
@@ -213,7 +213,7 @@
                             <h1>Your delegate pass.</h1>
                             <p>A shared vision. A day of new perspectives.</p>
                         </td>
-                        <td style="text-align:right;width:170px"><span class="paid">PAYMENT CONFIRMED</span></td>
+                        <td style="text-align:right;width:170px"><span class="pass-label">DELEGATE PASS</span></td>
                     </tr>
                 </table>
             </div>
@@ -257,7 +257,7 @@
                 </table>
             </div>
         </div>
-        <p class="page-note">Single entry for the named delegate. Our team will scan this QR code and verify payment at check-in. Copies share the same single-use pass.</p>
+        <p class="page-note">Single entry for the named delegate. Our team will scan this QR code to verify your pass at check-in. Copies share the same single-use pass.</p>
     </div>
 </body>
 

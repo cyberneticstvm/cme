@@ -9,7 +9,7 @@
     <link rel="canonical" href="{{ url()->current() }}">
     <meta property="og:type" content="website">
     <meta property="og:title" content="@yield('title', 'VISION X 2026 | Eye Care CME')">
-    <meta property="og:image" content="{{ asset('images/visionx-2026-poster.jpeg') }}">
+    <meta property="og:image" content="{{ asset('images/visionx-2026-event-poster.jpeg') }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">

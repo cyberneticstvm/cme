@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Registration;
-use App\PaymentStatus;
 use App\RegistrationStatus;
 
 class RegistrationCheckInService
@@ -35,7 +34,6 @@ class RegistrationCheckInService
             }
             $updated = Registration::whereKey($current->id)
                 ->where('pass_id', $token)->where('pass_qr_version', PassQrCode::VERSION)->whereNotNull('pass_issued_at')
-                ->where('payment_status', PaymentStatus::Confirmed)->whereNotNull('payment_confirmed_at')
                 ->where('status', '!=', RegistrationStatus::Cancelled)->whereNull('checked_in_at')
                 ->update(['checked_in_at' => now(), 'checked_in_by' => mb_substr($operator, 0, 120), 'checked_in_pass_id' => $token]);
             $current->refresh();
@@ -59,14 +57,12 @@ class RegistrationCheckInService
         if ($registration && $registration->pass_id === $token) {
             if ($registration->status === RegistrationStatus::Cancelled) {
                 [$state, $heading, $message] = ['cancelled', 'Registration cancelled', 'This registration is cancelled. Entry is not permitted.'];
-            } elseif (! $registration->canIssuePass()) {
-                [$state, $heading, $message] = ['unpaid', 'Payment is not confirmed', 'Entry is blocked until the organising team confirms payment.'];
             } elseif ($registration->pass_qr_version !== PassQrCode::VERSION || ! $registration->pass_issued_at) {
-                [$state, $heading, $message] = ['invalid', 'Pass needs to be replaced', 'Generate and email a current QR pass from the delegate payment page.'];
+                [$state, $heading, $message] = ['invalid', 'Pass needs to be replaced', 'Generate and email a current QR pass from the delegate record.'];
             } elseif ($registration->checked_in_at) {
                 [$state, $heading, $message] = ['already_checked_in', 'Already checked in', 'Attendance was recorded earlier. Do not admit this pass again.'];
             } else {
-                [$state, $heading, $message] = ['ready', 'Ready for check-in', 'Registration and payment are valid. Match the delegate details, then confirm attendance.'];
+                [$state, $heading, $message] = ['ready', 'Ready for check-in', 'Match the delegate details, then confirm attendance.'];
             }
         } else {
             $registration = null;
@@ -78,11 +74,10 @@ class RegistrationCheckInService
                 'reference' => $registration->reference, 'full_name' => $registration->full_name,
                 'profession' => $registration->profession->label(), 'email' => $registration->email,
                 'organisation' => $registration->organisation, 'status' => $registration->status->label(),
-                'payment_status' => $registration->payment_status->label(),
                 'checked_in_at' => $registration->checked_in_at?->toIso8601String(),
                 'checked_in_display' => $registration->checked_in_at ? $registration->checked_in_at->timezone('Asia/Kolkata')->format('d M Y, h:i A').' IST' : null,
                 'checked_in_by' => $registration->checked_in_by,
-                'manage_url' => route('admin.registrations.payment', $registration),
+                'manage_url' => route('admin.registrations.pass', $registration),
             ] : null,
         ];
     }

@@ -10,27 +10,31 @@ class HomePageTest extends TestCase
 {
     #[TestWith(['home'])]
     #[TestWith(['registrations.create'])]
-    public function test_public_pages_show_payment_details_before_registration(string $routeName): void
+    #[TestWith(['program-schedule'])]
+    public function test_public_pages_offer_free_registration(string $routeName): void
     {
-        config(['services.whatsapp.number' => '+919497005735']);
-
         $this->get(route($routeName))->assertOk()
-            ->assertSee('href="#registration-payment"', false)
-            ->assertSee('id="registration-payment"', false)
-            ->assertSee('css/payment.css')
-            ->assertSee('images/visionx-payment-qr.png')
-            ->assertSeeText('Rs.500/-')
-            ->assertSeeText('Register first to receive your five-digit registration ID.')
-            ->assertSeeText('Greetings from DEVI EYE HOSPITAL.')
-            ->assertSeeText('WhatsApp (+919497005735)')
-            ->assertSeeText('issue your gate pass');
+            ->assertSeeText('Registration is free.')
+            ->assertDontSee(['registration-payment', 'visionx-payment-qr.png', 'Rs.500/-']);
+    }
+
+    public function test_new_poster_appears_in_the_popup_and_announcement_links(): void
+    {
+        $posterUrl = asset('images/visionx-2026-event-poster.jpeg');
+
+        $this->get(route('home'))->assertOk()
+            ->assertSee('data-popup-poster data-src="'.$posterUrl.'"', false)
+            ->assertSee('property="og:image" content="'.$posterUrl.'"', false)
+            ->assertSee('href="'.$posterUrl.'"', false)
+            ->assertSee('width="1254" height="1254"', false);
+        $this->get(route('program-schedule'))->assertOk()
+            ->assertSee('property="og:image" content="'.$posterUrl.'"', false);
     }
 
     public function test_program_schedule_is_linked_and_publishes_sessions_and_workshops(): void
     {
         $this->get(route('home'))->assertOk()
-            ->assertSee('href="'.route('program-schedule').'"', false)
-            ->assertSeeText('Rs.500/-');
+            ->assertSee('href="'.route('program-schedule').'"', false);
 
         $this->get(route('program-schedule'))->assertOk()
             ->assertSeeText('Gemini Heights Auditorium')

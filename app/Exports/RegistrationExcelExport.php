@@ -36,7 +36,7 @@ class RegistrationExcelExport
             $xml->endElement();
             $xml->endElement();
             $xml->startElement('cols');
-            foreach ([34, 27, 19, 34, 22, 32, 22, 22, 17, 25, 25, 25, 25, 55, 55, 19, 18, 30, 25, 24, 25, 34, 19, 25, 25, 30, 25, 25, 34] as $index => $width) {
+            foreach ([34, 27, 19, 34, 22, 32, 22, 22, 17, 25, 25, 25, 25, 55, 55, 25, 34, 19, 25, 25, 30, 25, 25, 34] as $index => $width) {
                 $xml->startElement('col');
                 foreach (['min' => (string) ($index + 1), 'max' => (string) ($index + 1), 'width' => (string) $width, 'customWidth' => '1'] as $key => $value) {
                     $xml->writeAttribute($key, $value);
@@ -48,7 +48,7 @@ class RegistrationExcelExport
             $this->row($xml, 1, ['VISION X 2026 | Delegate registrations'], 1);
             $summary = $filters === [] ? 'All registrations' : collect($filters)->map(fn ($value, $key) => ucfirst($key).': '.$value)->implode(' | ');
             $this->row($xml, 2, ['Exported '.now()->timezone('Asia/Kolkata')->format('d M Y, h:i A').' IST | '.$summary], 3);
-            $headers = ['Registration ID', 'Full name', 'Profession', 'Email address', 'Mobile number', 'Organisation', 'City / town', 'State / region', 'Status', 'Registered at (IST)', 'Consent recorded (IST)', 'Acknowledgement sent (IST)', 'Organiser notified (IST)', 'Delegate message', 'Internal notes', 'Payment status', 'Amount (INR)', 'Payment reference', 'Payment confirmed (IST)', 'Confirmed by', 'Pass emailed (IST)', 'Pass emailed to', 'Attendance', 'Checked in at (IST)', 'Checked in by', 'Certificate number', 'Certificate issued (IST)', 'Certificate emailed (IST)', 'Certificate emailed to'];
+            $headers = ['Registration ID', 'Full name', 'Profession', 'Email address', 'Mobile number', 'Organisation', 'City / town', 'State / region', 'Status', 'Registered at (IST)', 'Consent recorded (IST)', 'Acknowledgement sent (IST)', 'Organiser notified (IST)', 'Delegate message', 'Internal notes', 'Pass emailed (IST)', 'Pass emailed to', 'Attendance', 'Checked in at (IST)', 'Checked in by', 'Certificate number', 'Certificate issued (IST)', 'Certificate emailed (IST)', 'Certificate emailed to'];
             $lastColumn = $this->columnName(count($headers));
             $this->row($xml, 4, $headers, 2);
             $number = 5;
@@ -61,9 +61,7 @@ class RegistrationExcelExport
                     $date($registration->created_at), $date($registration->consented_at),
                     $date($registration->acknowledgement_sent_at), $date($registration->notification_sent_at),
                     $registration->message ?? '', $registration->admin_notes ?? '',
-                    $registration->payment_status->label(), $registration->payment_amount ?? '',
-                    $registration->payment_reference ?? '', $date($registration->payment_confirmed_at),
-                    $registration->payment_confirmed_by ?? '', $date($registration->pass_sent_at), $registration->pass_sent_to ?? '',
+                    $date($registration->pass_sent_at), $registration->pass_sent_to ?? '',
                     $registration->checked_in_at ? 'Checked in' : 'Not checked in', $date($registration->checked_in_at), $registration->checked_in_by ?? '',
                     $registration->certificate_number ?? '', $date($registration->certificate_issued_at), $date($registration->certificate_sent_at), $registration->certificate_sent_to ?? '',
                 ]);

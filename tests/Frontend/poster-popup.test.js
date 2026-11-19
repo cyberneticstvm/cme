@@ -45,7 +45,13 @@ test('blocked local storage falls back to a persistent functional cookie', () =>
 test('unrelated cookies and unset flags do not suppress the announcement', () => {
     const storage = { getItem: () => '0' };
 
-    assert.equal(hasDismissedPoster(storage, 'another_cookie=1; visionx_poster_dismissed=0'), false);
+    assert.equal(hasDismissedPoster(storage, 'another_cookie=1; visionx_event_poster_dismissed=0'), false);
+});
+
+test('dismissing the previous poster does not suppress the new announcement', () => {
+    const storage = { getItem: key => key === 'visionx.poster.dismissed' ? '1' : null };
+
+    assert.equal(hasDismissedPoster(storage, 'visionx_poster_dismissed=1'), false);
 });
 
 test('unavailable storage does not break dismissal or the website', () => {

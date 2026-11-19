@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\PaymentStatus;
 use App\Profession;
 use App\RegistrationStatus;
 use App\Services\RegistrationReferenceGenerator;
@@ -45,9 +44,6 @@ class Registration extends Model
         if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        if (! empty($filters['payment_status'])) {
-            $query->where('payment_status', $filters['payment_status']);
-        }
         if (($filters['attendance'] ?? '') === 'checked_in') {
             $query->whereNotNull('checked_in_at');
         } elseif (($filters['attendance'] ?? '') === 'not_checked_in') {
@@ -63,9 +59,7 @@ class Registration extends Model
 
     public function canIssuePass(): bool
     {
-        return $this->payment_status === PaymentStatus::Confirmed
-            && $this->payment_confirmed_at !== null
-            && $this->status !== RegistrationStatus::Cancelled;
+        return $this->status !== RegistrationStatus::Cancelled;
     }
 
     public function canIssueCertificate(): bool
@@ -89,10 +83,6 @@ class Registration extends Model
         return [
             'profession' => Profession::class,
             'status' => RegistrationStatus::class,
-            'payment_status' => PaymentStatus::class,
-            'payment_amount' => 'decimal:2',
-            'payment_confirmed_at' => 'immutable_datetime',
-            'payment_updated_at' => 'immutable_datetime',
             'pass_issued_at' => 'immutable_datetime',
             'pass_qr_version' => 'integer',
             'checked_in_at' => 'immutable_datetime',

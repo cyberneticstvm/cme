@@ -14,31 +14,38 @@ class RegistrationPassService
 {
     public function __construct(private RegistrationWorkflowLock $lock, private DelegatePassPdf $pdf) {}
 
-    public function assertEligible(Registration $registration): void
-    {
-        if (! $registration->canIssuePass()) {
-            throw ValidationException::withMessages(['payment_status' => 'Confirm receipt of payment before generating, downloading or emailing a pass. Cancelled registrations cannot receive passes.']);
-        }
-    }
-
     public function generateAndSend(Registration $registration): bool
     {
         return $this->lock->run($registration, function (Registration $current): bool {
-            $this->assertEligible($current);
-            if (! $current->pass_id || $current->pass_qr_version !== PassQrCode::VERSION || ! Storage::disk('passes')->exists($current->passPath())) {
-                $this->revoke($current);
+            if (! $current->canIssuePass()) {
+                throw ValidationException::withMessages(['registration' => 'Cancelled registrations cannot receive delegate passes.']);
+            }
+
+            $disk = Storage::disk('passes');
+            $previousPath = $current->passPath();
+            $needsNewPass = ! $previousPath || $current->pass_qr_version !== PassQrCode::VERSION
+                || ! $current->pass_issued_at || ! $disk->exists($previousPath);
+            if ($needsNewPass) {
                 $current->pass_id = (string) Str::uuid();
                 $current->pass_issued_at = now();
                 $current->pass_qr_version = PassQrCode::VERSION;
-                $bytes = $this->pdf->render($current);
-                if (! Storage::disk('passes')->put($current->passPath(), $bytes)) {
-                    throw new RuntimeException('Unable to store the delegate pass.');
-                }
+                $current->pass_sent_at = null;
+                $current->pass_sent_to = null;
+            }
+
+            $bytes = $this->pdf->render($current);
+            if (! $disk->put($current->passPath(), $bytes)) {
+                throw new RuntimeException('Unable to store the delegate pass.');
+            }
+            if ($needsNewPass) {
                 try {
                     $current->save();
                 } catch (\Throwable $exception) {
-                    Storage::disk('passes')->delete($current->passPath());
+                    $disk->delete($current->passPath());
                     throw $exception;
+                }
+                if ($previousPath) {
+                    $disk->delete($previousPath);
                 }
             }
             if (in_array(config('mail.default'), ['log', 'array'], true)) {

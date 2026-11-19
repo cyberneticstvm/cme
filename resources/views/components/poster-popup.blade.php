@@ -5,7 +5,7 @@
     <div class="poster-layout">
         <div class="poster-artwork">
             <span class="poster-mobile-label">OFFICIAL EVENT ANNOUNCEMENT</span>
-            <img data-popup-poster data-src="{{ asset('images/visionx-2026-poster.jpeg') }}" alt="Official VISION X 2026 CME poster: Devi Eye Hospital in association with Indian Optometrists Association Kerala. Sunday, 6 December 2026, Sasthamcotta." width="1230" height="1278" decoding="async">
+            <img data-popup-poster data-src="{{ asset('images/visionx-2026-event-poster.jpeg') }}" alt="Official VISION X 2026 CME poster: Devi Eye Hospital in association with Indian Optometrists Association Kerala. Sunday, 6 December 2026, Sasthamcotta." width="1254" height="1254" decoding="async">
         </div>
         <div class="poster-copy">
             <div class="poster-copy-main">
@@ -19,7 +19,7 @@
             </div>
             <div class="poster-actions">
                 <button type="button" class="button poster-continue" data-dismiss-poster>Continue to website <x-icon name="arrow-right" /></button>
-                <a href="{{ asset('images/visionx-2026-poster.jpeg') }}" target="_blank" rel="noopener">View full-size poster <x-icon name="arrow-up-right" /></a>
+                <a href="{{ asset('images/visionx-2026-event-poster.jpeg') }}" target="_blank" rel="noopener">View full-size poster <x-icon name="arrow-up-right" /></a>
             </div>
             <p class="poster-signoff">A shared vision. A brighter tomorrow.</p>
         </div>

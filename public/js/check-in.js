@@ -50,7 +50,7 @@
         resultPanel.dataset.state = 'idle';
         text('[data-result-eyebrow]', 'READY FOR THE NEXT DELEGATE');
         text('[data-result-heading]', 'Ready when you are.');
-        text('[data-result-message]', 'Scan a pass to verify registration, payment and attendance.');
+        text('[data-result-message]', 'Scan a pass to verify registration and attendance.');
         get('[data-delegate-details]').hidden = true;
         confirm.hidden = true;
         next.hidden = true;
@@ -71,7 +71,7 @@
         resultPanel.dataset.state = result.state;
         text('[data-result-heading]', result.heading);
         text('[data-result-message]', result.message);
-        text('[data-result-eyebrow]', result.state === 'checked_in' ? 'WELCOME TO VISION X 2026' : result.state === 'ready' ? 'REGISTRATION & PAYMENT VERIFIED' : 'ENTRY NOT AUTHORISED');
+        text('[data-result-eyebrow]', result.state === 'checked_in' ? 'WELCOME TO VISION X 2026' : result.state === 'ready' ? 'DELEGATE PASS VERIFIED' : 'ENTRY NOT AUTHORISED');
         const delegate = result.registration;
         get('[data-delegate-details]').hidden = !delegate;
         if (delegate) {
@@ -80,7 +80,6 @@
             text('[data-delegate-profession]', delegate.profession);
             text('[data-delegate-reference]', delegate.reference);
             text('[data-delegate-status]', delegate.status);
-            text('[data-delegate-payment]', delegate.payment_status);
             text('[data-delegate-email]', delegate.email);
             text('[data-delegate-attendance]', delegate.checked_in_at ? `${delegate.checked_in_display} · ${delegate.checked_in_by}` : '');
             get('[data-attendance-row]').hidden = !delegate.checked_in_at;
@@ -124,7 +123,7 @@
         codeInput.value = code.trim();
         setBusy(true);
         text('[data-result-heading]', 'Checking this pass...');
-        text('[data-result-message]', 'Checking the current registration, payment and previous attendance.');
+        text('[data-result-message]', 'Checking the current registration and previous attendance.');
         try {
             const result = await post(root.dataset.verifyUrl, codeInput.value);
             if (generation !== requestGeneration) { return; }

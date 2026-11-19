@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Exceptions\RegistrationCapacityReached;
 use App\Http\Requests\StoreRegistrationRequest;
 use App\Models\Registration;
-use App\PaymentStatus;
 use App\Profession;
 use App\Services\RegistrationMailer;
-use App\Services\RegistrationPayment;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -58,39 +56,10 @@ class RegistrationController extends Controller
     {
         $receipt = $request->session()->get('registration_receipt');
 
-        if (! $receipt) {
+        if (! $receipt || ! Registration::where('reference', $receipt['reference'])->exists()) {
             return to_route('registrations.create');
         }
 
-        $registration = Registration::query()
-            ->where('reference', $receipt['reference'])
-            ->first(['payment_status', 'status']);
-
-        if (! $registration) {
-            return to_route('registrations.create');
-        }
-
-        return response()->view('registrations.thanks', [
-            'receipt' => $receipt,
-            'paymentDue' => RegistrationPayment::isDue($registration),
-        ])->header('Cache-Control', 'private, no-store');
-    }
-
-    public function payment(string $reference): Response
-    {
-        $registration = Registration::query()
-            ->where('reference', $reference)
-            ->firstOrFail(['reference', 'payment_status', 'status']);
-
-        return response()->view('registrations.payment', [
-            'reference' => $registration->reference,
-            'paymentConfirmed' => $registration->payment_status === PaymentStatus::Confirmed,
-            'appLinks' => RegistrationPayment::isDue($registration)
-                ? RegistrationPayment::appLinks($registration->reference)
-                : null,
-        ])->withHeaders([
-            'Cache-Control' => 'private, no-store',
-            'Referrer-Policy' => 'no-referrer',
-        ]);
+        return response()->view('registrations.thanks', ['receipt' => $receipt])->header('Cache-Control', 'private, no-store');
     }
 }

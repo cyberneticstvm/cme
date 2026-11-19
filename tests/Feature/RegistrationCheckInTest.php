@@ -50,7 +50,7 @@ class RegistrationCheckInTest extends TestCase
         $this->postJson(route('admin.check-in.verify'), ['code' => $this->code($registration)])
             ->assertOk()->assertJsonPath('state', 'ready')->assertJsonPath('can_check_in', true)
             ->assertJsonPath('registration.reference', $registration->reference)->assertJsonPath('registration.full_name', $registration->full_name)
-            ->assertJsonPath('registration.payment_status', 'Confirmed')->assertJsonMissingPath('registration.pass_id')
+            ->assertJsonMissingPath('registration.payment_status')->assertJsonMissingPath('registration.pass_id')
             ->assertHeader('Cache-Control', 'max-age=0, no-store, private');
         $this->get(route('admin.check-in.index', ['code' => $this->code($registration)]))->assertOk()->assertSee('Verify &amp; welcome', false);
         $this->assertNull($registration->fresh()->checked_in_at);
@@ -77,18 +77,14 @@ class RegistrationCheckInTest extends TestCase
         $this->assertTrue($registration->fresh()->checked_in_at->equalTo($firstCheckIn));
     }
 
-    #[TestWith(['pending', 'new', true, 1, true, 'unpaid'])]
-    #[TestWith(['refunded', 'new', true, 1, true, 'unpaid'])]
-    #[TestWith(['confirmed', 'cancelled', true, 1, true, 'cancelled'])]
-    #[TestWith(['confirmed', 'new', false, 1, true, 'unpaid'])]
-    #[TestWith(['confirmed', 'new', true, 0, true, 'invalid'])]
-    #[TestWith(['confirmed', 'new', true, 1, false, 'invalid'])]
-    public function test_invalid_payment_registration_and_pass_states_are_rejected(string $payment, string $status, bool $confirmed, int $version, bool $issued, string $state): void
+    #[TestWith(['cancelled', 1, true, 'cancelled'])]
+    #[TestWith(['new', 0, true, 'invalid'])]
+    #[TestWith(['new', 1, false, 'invalid'])]
+    public function test_cancelled_registrations_and_invalid_passes_cannot_check_in(string $status, int $version, bool $issued, string $state): void
     {
-        $registration = $this->issued(['payment_status' => $payment, 'status' => $status, 'payment_confirmed_at' => $confirmed ? now() : null,
-            'pass_qr_version' => $version, 'pass_issued_at' => $issued ? now() : null]);
+        $registration = $this->issued(['status' => $status, 'pass_qr_version' => $version, 'pass_issued_at' => $issued ? now() : null]);
         $this->signIn();
-        $payload = ['code' => $this->code($registration), 'payment_status' => 'confirmed'];
+        $payload = ['code' => $this->code($registration)];
         $this->postJson(route('admin.check-in.verify'), $payload)->assertOk()->assertJsonPath('state', $state)->assertJsonPath('can_check_in', false);
         $this->postJson(route('admin.check-in.store'), $payload)->assertConflict()->assertJsonPath('state', $state);
         $this->assertNull($registration->fresh()->checked_in_at);
@@ -117,15 +113,15 @@ class RegistrationCheckInTest extends TestCase
         $this->assertNull($registration->fresh()->checked_in_at);
     }
 
-    public function test_a_refund_between_verification_and_confirmation_blocks_entry(): void
+    public function test_a_cancellation_between_verification_and_confirmation_blocks_entry(): void
     {
         Storage::fake('passes');
         $registration = $this->issued();
         $code = $this->code($registration);
         $this->signIn();
         $this->postJson(route('admin.check-in.verify'), ['code' => $code])->assertJsonPath('state', 'ready');
-        $this->put(route('admin.registrations.payment.update', $registration), ['payment_status' => 'refunded'])->assertSessionHasNoErrors();
-        $this->postJson(route('admin.check-in.store'), ['code' => $code])->assertConflict()->assertJsonPath('state', 'invalid');
+        Registration::whereKey($registration->id)->update(['status' => 'cancelled']);
+        $this->postJson(route('admin.check-in.store'), ['code' => $code])->assertConflict()->assertJsonPath('state', 'cancelled');
         $this->assertNull($registration->fresh()->checked_in_at);
     }
 
@@ -220,7 +216,7 @@ class RegistrationCheckInTest extends TestCase
     private function issued(array $attributes = []): Registration
     {
         return Registration::factory()->create(array_merge([
-            'status' => 'new', 'payment_status' => 'confirmed', 'payment_confirmed_at' => now(),
+            'status' => 'new',
             'pass_id' => (string) Str::uuid(), 'pass_qr_version' => 1, 'pass_issued_at' => now(),
         ], $attributes));
     }

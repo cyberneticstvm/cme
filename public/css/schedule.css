@@ -256,11 +256,6 @@
     padding-top: 22px;
 }
 
-.schedule-registration strong {
-    margin-inline-start: 6px;
-    color: var(--navy);
-}
-
 @media (max-width: 750px) {
     .schedule-hero-grid, .schedule-workshop-panel {
         grid-template-columns: minmax(0, 1fr);

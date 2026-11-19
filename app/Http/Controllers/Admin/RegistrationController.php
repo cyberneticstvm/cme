@@ -8,7 +8,6 @@ use App\Http\Requests\Admin\DestroyRegistrationRequest;
 use App\Http\Requests\Admin\RegistrationFilterRequest;
 use App\Http\Requests\Admin\UpdateRegistrationRequest;
 use App\Models\Registration;
-use App\PaymentStatus;
 use App\Profession;
 use App\RegistrationStatus;
 use App\Services\RegistrationCertificateService;
@@ -36,7 +35,6 @@ class RegistrationController extends Controller
             'newCount' => Registration::where('status', RegistrationStatus::New)->count(),
             'professions' => Profession::cases(),
             'statuses' => RegistrationStatus::cases(),
-            'paymentStatuses' => PaymentStatus::cases(),
         ]);
     }
 

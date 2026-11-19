@@ -258,7 +258,7 @@ class RegistrationCertificateTest extends TestCase
         Storage::disk('certificates')->assertDirectoryEmpty('/');
     }
 
-    public function test_recorded_participation_remains_eligible_after_a_later_payment_refund(): void
+    public function test_recorded_participation_is_eligible_with_a_legacy_refunded_registration(): void
     {
         $registration = $this->attended(['payment_status' => 'refunded']);
         $this->signIn();
@@ -274,8 +274,8 @@ class RegistrationCertificateTest extends TestCase
     private function attended(array $overrides = []): Registration
     {
         return Registration::factory()->create(array_merge([
-            'profession' => 'doctor', 'status' => 'confirmed', 'payment_status' => 'confirmed',
-            'payment_confirmed_at' => now(), 'checked_in_at' => now(), 'checked_in_by' => 'event-admin',
+            'profession' => 'doctor', 'status' => 'confirmed',
+            'checked_in_at' => now(), 'checked_in_by' => 'event-admin',
         ], $overrides));
     }
 

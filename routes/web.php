@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Admin\CheckInController;
 use App\Http\Controllers\Admin\RegistrationCertificateController;
-use App\Http\Controllers\Admin\RegistrationPaymentController;
+use App\Http\Controllers\Admin\RegistrationPassController;
 use App\Http\Controllers\Admin\SessionController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\RegistrationRecoveryController;
@@ -17,8 +17,7 @@ Route::post('/register/check-email', [RegistrationRecoveryController::class, 'ch
 Route::get('/registration-id', [RegistrationRecoveryController::class, 'create'])->name('registrations.recover');
 Route::post('/registration-id', [RegistrationRecoveryController::class, 'send'])->middleware('throttle:registration-recovery')->name('registrations.recover.send');
 Route::get('/register/thank-you', [RegistrationController::class, 'thanks'])->name('registrations.thanks');
-Route::get('/register/payment/{reference}', [RegistrationController::class, 'payment'])
-    ->middleware('signed')->name('registrations.payment');
+Route::get('/register/payment/{reference}', fn () => to_route('registrations.recover'));
 
 Route::prefix('admin')->name('admin.')->middleware('admin.headers')->group(function (): void {
     Route::get('/login', [SessionController::class, 'create'])->name('login');
@@ -33,10 +32,9 @@ Route::prefix('admin')->name('admin.')->middleware('admin.headers')->group(funct
         Route::get('/registrations/{registration}/certificate', [RegistrationCertificateController::class, 'show'])->name('registrations.certificate');
         Route::post('/registrations/{registration}/certificate', [RegistrationCertificateController::class, 'store'])->middleware('throttle:admin-emails')->name('registrations.certificate.send');
         Route::get('/registrations/{registration}/certificate/download', [RegistrationCertificateController::class, 'download'])->name('registrations.certificate.download');
-        Route::get('/registrations/{registration}/payment', [RegistrationPaymentController::class, 'show'])->name('registrations.payment');
-        Route::put('/registrations/{registration}/payment', [RegistrationPaymentController::class, 'update'])->name('registrations.payment.update');
-        Route::post('/registrations/{registration}/pass', [RegistrationPaymentController::class, 'sendPass'])->middleware('throttle:admin-emails')->name('registrations.pass.send');
-        Route::get('/registrations/{registration}/pass', [RegistrationPaymentController::class, 'download'])->name('registrations.pass.download');
+        Route::get('/registrations/{registration}/pass/manage', [RegistrationPassController::class, 'show'])->name('registrations.pass');
+        Route::post('/registrations/{registration}/pass', [RegistrationPassController::class, 'sendPass'])->middleware('throttle:admin-emails')->name('registrations.pass.send');
+        Route::get('/registrations/{registration}/pass', [RegistrationPassController::class, 'download'])->name('registrations.pass.download');
         Route::get('/registrations/{registration}', [App\Http\Controllers\Admin\RegistrationController::class, 'show'])->name('registrations.show');
         Route::put('/registrations/{registration}', [App\Http\Controllers\Admin\RegistrationController::class, 'update'])->name('registrations.update');
         Route::delete('/registrations/{registration}', [App\Http\Controllers\Admin\RegistrationController::class, 'destroy'])->name('registrations.destroy');

@@ -1,5 +1,4 @@
 @extends('layouts.site')
-@use('App\Services\RegistrationPayment')
 @section('title', 'Registration Received | VISION X 2026')
 @section('head')<meta name="robots" content="noindex, nofollow"><meta http-equiv="Cache-Control" content="no-store">@endsection
 @section('content')
@@ -14,11 +13,6 @@
             Your registration is safely saved. Your email acknowledgement is pending; please keep the ID above and contact us on WhatsApp if you need assistance.
         @endif
     </p></div>
-    @if ($paymentDue)
-        <x-registration-payment :reference="$receipt['reference']">
-            <a class="button" href="{{ RegistrationPayment::url($receipt['reference']) }}">Pay with UPI <x-icon name="arrow-up-right" /></a>
-        </x-registration-payment>
-    @endif
     <div class="delegate-success-event"><span><x-icon name="calendar" />Sunday, 6 December 2026</span><span><x-icon name="pin" />Gemini Heights Auditorium, Sasthamcotta</span></div>
     <div class="delegate-success-actions"><a class="button" href="{{ asset('visionx-2026.ics') }}" download>Save the date <x-icon name="calendar" /></a><a class="text-link" href="{{ route('program-schedule') }}">View the program schedule <x-icon name="arrow-right" /></a></div>
 </div></div></section>

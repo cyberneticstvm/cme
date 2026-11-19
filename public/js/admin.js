@@ -26,20 +26,6 @@
         if (menu) { menu.open = false; menu.querySelector('summary').focus(); }
     });
 
-    const paymentForm = document.querySelector('[data-payment-form]');
-    if (paymentForm) {
-        const status = paymentForm.querySelector('[name="payment_status"]');
-        const confirmation = paymentForm.querySelector('[data-payment-confirm]');
-        const checkbox = confirmation.querySelector('input');
-        const refreshPayment = () => {
-            confirmation.hidden = status.value !== 'confirmed';
-            checkbox.required = status.value === 'confirmed';
-            if (!checkbox.required) { checkbox.checked = false; }
-        };
-        status.addEventListener('change', refreshPayment);
-        refreshPayment();
-    }
-
     const deleteDialog = document.querySelector('#admin-delete-dialog');
     if (!deleteDialog) { return; }
     const deleteForm = deleteDialog.querySelector('[data-delete-form]');

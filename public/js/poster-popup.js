@@ -1,5 +1,5 @@
-export const posterDismissalKey = 'visionx.poster.dismissed';
-const posterCookieName = 'visionx_poster_dismissed';
+export const posterDismissalKey = 'visionx.poster.event-poster.dismissed';
+const posterCookieName = 'visionx_event_poster_dismissed';
 
 export function hasDismissedPoster(storage, cookies = '') {
     try {

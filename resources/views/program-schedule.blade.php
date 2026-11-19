@@ -1,5 +1,4 @@
 @extends('layouts.site')
-@use('App\Services\RegistrationPayment')
 
 @section('title', 'Program Schedule | VISION X 2026')
 @section('description', 'Explore the VISION X 2026 Optometry CME schedule, speakers and hands-on workshops on 6 December at Gemini Heights Auditorium, Sasthamcotta.')
@@ -89,7 +88,7 @@
             </ul>
         </div>
         <div class="schedule-registration">
-            <p>Registration fee <strong>Rs.{{ RegistrationPayment::FEE }}/-</strong></p>
+            <p>Registration is free.</p>
             <a class="button" href="{{ route('registrations.create') }}">Register for VISION X <x-icon name="arrow-up-right" /></a>
         </div>
     </section>

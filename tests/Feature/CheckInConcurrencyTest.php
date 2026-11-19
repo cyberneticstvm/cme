@@ -24,7 +24,7 @@ class CheckInConcurrencyTest extends TestCase
             config(['database.default' => 'sqlite', 'database.connections.sqlite.database' => $database, 'database.connections.sqlite.url' => null]);
             DB::purge('sqlite');
             Artisan::call('migrate', ['--force' => true, '--no-interaction' => true]);
-            $registration = Registration::factory()->create(['status' => 'new', 'payment_status' => 'confirmed', 'payment_confirmed_at' => now(),
+            $registration = Registration::factory()->create(['status' => 'new',
                 'pass_id' => (string) Str::uuid(), 'pass_qr_version' => 1, 'pass_issued_at' => now()]);
             $worker = $directory.'/worker.php';
             file_put_contents($worker, <<<'PHP'

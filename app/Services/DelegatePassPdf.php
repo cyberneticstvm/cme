@@ -14,7 +14,7 @@ class DelegatePassPdf
     public function render(Registration $registration): string
     {
         if (! $registration->canIssuePass()) {
-            throw ValidationException::withMessages(['payment_status' => 'Payment must be confirmed before a pass can be generated.']);
+            throw ValidationException::withMessages(['registration' => 'Cancelled registrations cannot receive delegate passes.']);
         }
         if (! class_exists(Dompdf::class)) {
             throw ValidationException::withMessages(['registration' => 'The PDF service is not configured yet. Please contact your system administrator.']);

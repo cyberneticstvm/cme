@@ -20,9 +20,9 @@ class DelegatePassPdfTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
-    public function test_pdf_renderer_rejects_an_unpaid_registration(): void
+    public function test_pdf_renderer_rejects_a_cancelled_registration(): void
     {
-        $registration = Registration::factory()->create();
+        $registration = Registration::factory()->create(['status' => 'cancelled']);
         $this->expectException(ValidationException::class);
         app(DelegatePassPdf::class)->render($registration);
     }
@@ -30,7 +30,7 @@ class DelegatePassPdfTest extends TestCase
     #[TestWith(['Dr Meera Nair'])]
     #[TestWith(['Professor '.'Alexandria Catherine Krishnamurthy Narayanan Subramanian Ramanathan Srinivasan Viswanathan'])]
     #[TestWith(['Dr Meera Nair', 'VX26-01M7ANC74CE3W74B5R28GMEXBE'])]
-    public function test_confirmed_delegate_pass_renders_as_one_pdf_page(string $name, ?string $reference = null): void
+    public function test_active_delegate_pass_renders_as_one_pdf_page(string $name, ?string $reference = null): void
     {
         $registration = $this->issued($name);
         if ($reference !== null) {
@@ -50,10 +50,12 @@ class DelegatePassPdfTest extends TestCase
         $this->assertStringContainsString('&lt;script&gt;delegate&lt;/script&gt;', $html);
         $this->assertStringNotContainsString('<script>delegate</script>', $html);
         $this->assertStringContainsString($registration->reference, $html);
+        $this->assertStringNotContainsString('payment', strtolower($html));
         Storage::fake('passes');
         Storage::disk('passes')->put($registration->passPath(), '%PDF-1.4 test attachment');
         $mail = new DelegatePass($registration);
-        $mail->assertSeeInHtml($registration->reference)->assertSeeInText($registration->reference);
+        $mail->assertSeeInHtml($registration->reference)->assertSeeInText($registration->reference)
+            ->assertDontSeeInHtml('payment')->assertDontSeeInText('payment');
         $this->assertStringContainsString($registration->reference, $mail->envelope()->subject);
     }
 
@@ -86,7 +88,7 @@ class DelegatePassPdfTest extends TestCase
     private function issued(string $name): Registration
     {
         $registration = Registration::factory()->create([
-            'full_name' => $name, 'payment_status' => 'confirmed', 'payment_confirmed_at' => now(), 'status' => 'new',
+            'full_name' => $name, 'status' => 'new',
             'organisation' => str_repeat('Long Organisation Name ', 8),
         ]);
         $registration->pass_id = (string) Str::uuid();

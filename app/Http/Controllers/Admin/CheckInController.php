@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CheckInRequest;
 use App\Models\Registration;
-use App\PaymentStatus;
 use App\RegistrationStatus;
 use App\Services\RegistrationCheckInService;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +16,7 @@ class CheckInController extends Controller
     {
         return view('admin.check-in', [
             'checkedIn' => Registration::whereNotNull('checked_in_at')->count(),
-            'paidCount' => Registration::where('payment_status', PaymentStatus::Confirmed)->whereNotNull('payment_confirmed_at')->where('status', '!=', RegistrationStatus::Cancelled)->count(),
+            'activeCount' => Registration::where('status', '!=', RegistrationStatus::Cancelled)->count(),
             'recent' => Registration::whereNotNull('checked_in_at')->latest('checked_in_at')->latest('id')->limit(6)->get(),
         ]);
     }

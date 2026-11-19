@@ -3,11 +3,10 @@
 namespace Tests\Feature;
 
 use App\Mail\RegistrationAcknowledgement;
+use App\Mail\RegistrationIdReminder;
 use App\Mail\RegistrationNotification;
 use App\Models\Registration;
-use App\PaymentStatus;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -15,7 +14,7 @@ use Tests\TestCase;
 
 class RegistrationMailTest extends TestCase
 {
-    #[TestWith([RegistrationAcknowledgement::class, ['visionx-2026-logo.png', 'visionx-payment-qr.png', 'devi-eye-hospital-transparent.png']])]
+    #[TestWith([RegistrationAcknowledgement::class, ['visionx-2026-logo.png', 'devi-eye-hospital-transparent.png']])]
     #[TestWith([RegistrationNotification::class, ['visionx-2026-logo.png', 'devi-eye-hospital-transparent.png']])]
     /** @param list<string> $filenames */
     public function test_emails_are_assembled_with_inline_images_and_plain_text(string $mailableClass, array $filenames): void
@@ -60,30 +59,25 @@ class RegistrationMailTest extends TestCase
         $mail->assertSeeInText('6 December 2026');
     }
 
-    public function test_acknowledgement_provides_payment_and_gate_pass_instructions_in_both_formats(): void
+    public function test_acknowledgement_explains_free_registration_and_pass_delivery_in_both_formats(): void
     {
-        config(['services.whatsapp.number' => '+91 (94970) 05735']);
         $registration = Registration::factory()->make(['reference' => '12345']);
         $mail = new RegistrationAcknowledgement($registration);
-        $paymentUrl = URL::signedRoute('registrations.payment', ['reference' => '12345']);
 
-        foreach (['Rs.500/-', 'payment screenshot and registration ID', '+919497005735', 'gate pass', $paymentUrl] as $text) {
-            $mail->assertSeeInHtml($text);
-            $mail->assertSeeInText($text);
-        }
-
-        $mail->assertSeeInHtml('Devi Eye Hospital payment QR code');
-        $mail->assertSeeInHtml('https://wa.me/919497005735?text=');
+        $mail->assertSeeInHtml('Registration is free. The organising team will email your delegate pass separately.')
+            ->assertSeeInText('Registration is free. The organising team will email your delegate pass separately.')
+            ->assertDontSeeInHtml('payment')
+            ->assertDontSeeInText('payment');
     }
 
-    public function test_acknowledgement_omits_payment_instructions_when_payment_is_confirmed(): void
+    public function test_registration_id_reminder_excludes_legacy_payment_instructions(): void
     {
-        $registration = Registration::factory()->make(['reference' => '12345', 'payment_status' => PaymentStatus::Confirmed]);
+        $registration = Registration::factory()->make(['reference' => '12345', 'payment_status' => 'pending']);
 
-        $mail = new RegistrationAcknowledgement($registration);
+        $mail = new RegistrationIdReminder($registration);
 
-        $mail->assertDontSeeInHtml('Devi Eye Hospital payment QR code');
-        $mail->assertDontSeeInText('Rs.500/-');
+        $mail->assertSeeInHtml('12345')->assertSeeInText('12345')
+            ->assertDontSeeInHtml('payment')->assertDontSeeInText('payment');
     }
 
     public function test_organiser_email_contains_complete_details_and_reply_to_delegate(): void
